@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wei4Wang — Research Data Hub</title>
+    <meta name="description" content="Wei4Wang's personal scientific research data navigation hub">
+    <style>
+        /* ===== CSS Reset & Variables ===== */
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #16161e;
+            --bg-card-hover: #1c1c28;
+            --bg-glass: rgba(22, 22, 30, 0.7);
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --text-muted: #606070;
+            --accent-blue: #4f8cff;
+            --accent-cyan: #00d4ff;
+            --accent-purple: #9d6bff;
+            --accent-pink: #ff6b9d;
+            --accent-gold: #ffd700;
+            --accent-green: #00e88f;
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-hover: rgba(79, 140, 255, 0.3);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ===== Animated Star Background ===== */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ===== Aurora Gradient Overlay ===== */
+        .aurora {
+            position: fixed;
+            top: -30%;
+            left: -10%;
+            width: 120%;
+            height: 80%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.35;
+            filter: blur(100px);
+            background: radial-gradient(ellipse at 20% 50%, #4f8cff 0%, transparent 50%),
+                        radial-gradient(ellipse at 60% 30%, #9d6bff 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 70%, #00d4ff 0%, transparent 50%);
+            animation: aurora-drift 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes aurora-drift {
+            0%   { transform: translate(0, 0) scale(1); }
+            50%  { transform: translate(30px, -20px) scale(1.05); }
+            100% { transform: translate(-20px, 30px) scale(0.95); }
+        }
+
+        /* ===== Navigation Bar ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(10, 10, 15, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+            transition: var(--transition);
+        }
+
+        .navbar .logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            padding: 6px 14px;
+            border-radius: 20px;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+            background: rgba(79, 140, 255, 0.12);
+        }
+
+        /* ===== Hero Section ===== */
+        .hero {
+            position: relative;
+            z-index: 1;
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 20px 60px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 18px;
+            border-radius: 30px;
+            background: rgba(79, 140, 255, 0.08);
+            border: 1px solid rgba(79, 140, 255, 0.2);
+            font-size: 0.8rem;
+            color: var(--accent-blue);
+            margin-bottom: 28px;
+            animation: fade-in-up 0.8s ease forwards;
+        }
+
+        .hero-badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 1.05;
+            margin-bottom: 24px;
+            animation: fade-in-up 0.8s ease 0.1s both;
+        }
+
+        .hero h1 .gradient-text {
+            background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 30%, var(--accent-purple) 60%, var(--accent-pink) 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 6s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-bottom: 40px;
+            animation: fade-in-up 0.8s ease 0.2s both;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 48px;
+            animation: fade-in-up 0.8s ease 0.3s both;
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat .num {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-stat .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== Search Bar ===== */
+        .search-container {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 16px 20px 16px 52px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.1);
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-box .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .search-box .clear-btn {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: none;
+            transition: var(--transition);
+        }
+
+        .search-box .clear-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .search-box.has-text .clear-btn {
+            display: block;
+        }
+
+        /* ===== Category Sections ===== */
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 40px 100px;
+        }
+
+        .category-section {
+            margin-bottom: 72px;
+            scroll-margin-top: 80px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .category-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .category-title {
+            flex: 1;
+        }
+
+        .category-title h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .category-title .count {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .category-divider {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, var(--border-subtle), transparent);
+        }
+
+        /* ===== Database Cards Grid ===== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .db-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            text-decoration: none;
+            color: inherit;
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .db-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--card-accent, var(--accent-blue));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .db-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3),
+                        0 0 0 1px var(--border-hover);
+        }
+
+        .db-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .db-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .db-card-index {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .db-card-external {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .db-card:hover .db-card-external {
+            color: var(--card-accent, var(--accent-blue));
+        }
+
+        .db-card h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .db-card:hover h3 {
+            color: var(--card-accent, var(--accent-blue));
+        }
+
+        .db-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .db-card-url {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: 'SF Mono', 'Consolas', monospace;
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .db-card-url .url-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ===== Category Colors ===== */
+        .cat-weather   { --card-accent: var(--accent-cyan); }
+        .cat-geology   { --card-accent: var(--accent-gold); }
+        .cat-human     { --card-accent: var(--accent-pink); }
+        .cat-environ   { --card-accent: var(--accent-green); }
+        .cat-ocean     { --card-accent: #00b4d8; }
+        .cat-history   { --card-accent: #e09f3e; }
+        .cat-platform  { --card-accent: var(--accent-purple); }
+        .cat-tech      { --card-accent: var(--accent-blue); }
+        .cat-remote    { --card-accent: #f72585; }
+        .cat-compre    { --card-accent: #56cfe1; }
+        .cat-extra     { --card-accent: #b5179e; }
+
+        .cat-weather   .category-icon { background: rgba(0, 212, 255, 0.1); }
+        .cat-geology   .category-icon { background: rgba(255, 215, 0, 0.1); }
+        .cat-human     .category-icon { background: rgba(255, 107, 157, 0.1); }
+        .cat-environ   .category-icon { background: rgba(0, 232, 143, 0.1); }
+        .cat-ocean     .category-icon { background: rgba(0, 180, 216, 0.1); }
+        .cat-history   .category-icon { background: rgba(224, 159, 62, 0.1); }
+        .cat-platform  .category-icon { background: rgba(157, 107, 255, 0.1); }
+        .cat-tech      .category-icon { background: rgba(79, 140, 255, 0.1); }
+        .cat-remote    .category-icon { background: rgba(247, 37, 133, 0.1); }
+        .cat-compre    .category-icon { background: rgba(86, 207, 225, 0.1); }
+        .cat-extra     .category-icon { background: rgba(181, 23, 158, 0.1); }
+
+        /* ===== No Results Message ===== */
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+            display: none;
+        }
+
+        .no-results.show {
+            display: block;
+        }
+
+        .no-results .icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        /* ===== Footer ===== */
+        .footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .footer .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+
+        .footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer a:hover {
+            color: var(--accent-blue);
+        }
+
+        /* ===== Scroll Progress Bar ===== */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            width: 0%;
+            background: linear-gradient(to right, var(--accent-cyan), var(--accent-purple));
+            z-index: 9999;
+            transition: width 0.1s;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 16px;
+            }
+            .nav-links {
+                display: none;
+            }
+            .hero {
+                min-height: 50vh;
+                padding-top: 100px;
+            }
+            .hero-stats {
+                gap: 24px;
+            }
+            .content-wrapper {
+                padding: 0 16px 60px;
+            }
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Animated Background -->
+    <canvas id="starfield"></canvas>
+    <div class="aurora"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">Wei4Wang</div>
+        <ul class="nav-links">
+            <li><a href="#weather">气象气候</a></li>
+            <li><a href="#geology">地质地形</a></li>
+            <li><a href="#human">人文社会</a></li>
+            <li><a href="#environ">环境生态</a></li>
+            <li><a href="#ocean">海洋水文</a></li>
+            <li><a href="#history">历史地理</a></li>
+            <li><a href="#platform">综合平台</a></li>
+            <li><a href="#tech">地图技术</a></li>
+            <li><a href="#remote">遥感卫星</a></li>
+            <li><a href="#compre">综合数据</a></li>
+            <li><a href="#extra">在线工具</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge">
+            <span class="dot"></span>
+            <span>Scientific Research Data Navigation</span>
+        </div>
+        <h1>
+            <span class="gradient-text">Research</span><br>
+            <span>Data Hub</span>
+        </h1>
+        <p>一站式科研数据导航平台，汇集 52+ 权威科研数据库，覆盖气象、地质、生态、海洋、遥感等全域地理科学数据资源。</p>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="num" id="statTotal">52</div>
+                <div class="label">Databases</div>
+            </div>
+            <div class="hero-stat">
+                <div class="num">11</div>
+                <div class="label">Categories</div>
+            </div>
+            <div class="hero-stat">
+                <div class="num">Global</div>
+                <div class="label">Coverage</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search -->
+    <div class="search-container">
+        <div class="search-box" id="searchBox">
+            <span class="search-icon">&#128269;</span>
+            <input type="text" id="searchInput" placeholder="搜索数据库名称、关键词或类别..." autocomplete="off">
+            <button class="clear-btn" id="clearBtn" title="清除搜索">&#10005;</button>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content-wrapper" id="contentWrapper">
+
+        <!-- Category 1: Weather & Climate -->
+        <section class="category-section" id="weather">
+            <div class="category-header">
+                <div class="category-icon cat-weather">&#9728;</div>
+                <div class="category-title">
+                    <h2>气象气候类</h2>
+                    <span class="count">5 databases</span>
+                </div>
+                <div class="category-divider"></div>
+            </div>
+            <div class="cards-grid">
+                <a class="db-card cat-weather" href="http://data.cma.cn/" target="_blank" rel="noopener" data-keywords="中国气象数据网 气象局 观测 预报 气候">
+                    <div class="db-card-top">
+                        <span class="db-card-index">01</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>中国气象数据网</h3>
+                    <p>由中国气象局主办，提供气象观测、预报、气候等多方面权威数据。</p>
+                    <div class="db-card-url"><span class="url-text">data.cma.cn</span></div>
+                </a>
+                <a class="db-card cat-weather" href="http://ncc.cma.gov.cn" target="_blank" rel="noopener" data-keywords="国家气候中心 气候监测 预测 评估">
+                    <div class="db-card-top">
+                        <span class="db-card-index">02</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>中国国家气候中心</h3>
+                    <p>专注于气候监测、预测、评估等数据服务，为气候变化研究等提供支撑。</p>
+                    <div class="db-card-url"><span class="url-text">ncc.cma.gov.cn</span></div>
+                </a>
+                <a class="db-card cat-weather" href="http://www.wmo.ch" target="_blank" rel="noopener" data-keywords="世界气象组织 WMO 全球气象">
+                    <div class="db-card-top">
+                        <span class="db-card-index">03</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>世界气象组织 (WMO)</h3>
+                    <p>作为国际气象组织，汇总全球气象数据，涵盖气象观测、气候分析等多领域数据。</p>
+                    <div class="db-card-url"><span class="url-text">www.wmo.ch</span></div>
+                </a>
+                <a class="db-card cat-weather" href="https://www.ngdc.noaa.gov/eog/" target="_blank" rel="noopener" data-keywords="NOAA 美国海洋大气局 地球大气 海洋 海图">
+                    <div class="db-card-top">
+                        <span class="db-card-index">04</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>美国国家海洋和大气管理局 (NOAA)</h3>
+                    <p>除关注地球大气和海洋变化，还提供海图等数据，对气象研究有重要价值。</p>
+                    <div class="db-card-url"><span class="url-text">ngdc.noaa.gov</span></div>
+                </a>
+                <a class="db-card cat-weather" href="https://www.ventusky.com/" target="_blank" rel="noopener" data-keywords="全球气象平台 实时 风速 气压 降水 可视化">
+                    <div class="db-card-top">
+                        <span class="db-card-index">05</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>Ventusky 全球气象平台</h3>
+                    <p>可直观查看全球实时气象数据，如风速、气压、降水等，数据更新快，可视化效果好。</p>
+                    <div class="db-card-url"><span class="url-text">ventusky.com</span></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Category 2: Geology & Terrain -->
+        <section class="category-section" id="geology">
+            <div class="category-header">
+                <div class="category-icon cat-geology">&#9968;</div>
+                <div class="category-title">
+                    <h2>地质与地形类</h2>
+                    <span class="count">5 databases</span>
+                </div>
+                <div class="category-divider"></div>
+            </div>
+            <div class="cards-grid">
+                <a class="db-card cat-geology" href="https://www.cea.gov.cn/" target="_blank" rel="noopener" data-keywords="中国地震局 地震 监测 震情">
+                    <div class="db-card-top">
+                        <span class="db-card-index">06</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>中国地震局</h3>
+                    <p>提供大量地震相关数据和信息，包括地震监测数据、震情报告等。</p>
+                    <div class="db-card-url"><span class="url-text">cea.gov.cn</span></div>
+                </a>
+                <a class="db-card cat-geology" href="http://www.bigemap.com/source/" target="_blank" rel="noopener" data-keywords="Bigemap 高清地图 地形图 下载">
+                    <div class="db-card-top">
+                        <span class="db-card-index">07</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>Bigemap 高清地图资源下载站</h3>
+                    <p>有中国各省区的地形图资源，可下载多种比例尺的地形图。</p>
+                    <div class="db-card-url"><span class="url-text">bigemap.com</span></div>
+                </a>
+                <a class="db-card cat-geology" href="https://earthexplorer.usgs.gov/" target="_blank" rel="noopener" data-keywords="USGS 美国地质勘探局 EarthExplorer 地质 灾害 资源">
+                    <div class="db-card-top">
+                        <span class="db-card-index">08</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>美国地质勘探局 (USGS EarthExplorer)</h3>
+                    <p>在自然灾害、地质、资源等多方面有丰富数据和研究成果，提供全球地质数据查询和下载。</p>
+                    <div class="db-card-url"><span class="url-text">earthexplorer.usgs.gov</span></div>
+                </a>
+                <a class="db-card cat-geology" href="http://www.opentopography.org" target="_blank" rel="noopener" data-keywords="OpenTopography 地形 LIDAR 高分辨率">
+                    <div class="db-card-top">
+                        <span class="db-card-index">09</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>OpenTopography</h3>
+                    <p>提供高空间分辨率的地形数据和操作工具，可下载 LIDAR 数据。</p>
+                    <div class="db-card-url"><span class="url-text">opentopography.org</span></div>
+                </a>
+                <a class="db-card cat-geology" href="http://www.diva-gis.org/data" target="_blank" rel="noopener" data-keywords="DIVA GIS 基础地理 边界 铁路">
+                    <div class="db-card-top">
+                        <span class="db-card-index">10</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>DIVA GIS</h3>
+                    <p>包含全球各个国家的基础地理数据，如边界、铁路等，可用于区域地质和地理研究。</p>
+                    <div class="db-card-url"><span class="url-text">diva-gis.org</span></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Category 3: Human & Socio-Economic -->
+        <section class="category-section" id="human">
+            <div class="category-header">
+                <div class="category-icon cat-human">&#127760;</div>
+                <div class="category-title">
+                    <h2>人文与社会经济类</h2>
+                    <span class="count">5 databases</span>
+                </div>
+                <div class="category-divider"></div>
+            </div>
+            <div class="cards-grid">
+                <a class="db-card cat-human" href="http://www.csed.cn/" target="_blank" rel="noopener" data-keywords="中国社会经济数据网 人口 经济 社会">
+                    <div class="db-card-top">
+                        <span class="db-card-index">11</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>中国社会经济数据网</h3>
+                    <p>提供中国社会经济数据，包括人口、经济、社会等方面的数据，适合人文地理和社会经济研究。</p>
+                    <div class="db-card-url"><span class="url-text">csed.cn</span></div>
+                </a>
+                <a class="db-card cat-human" href="http://www.stats.gov.cn/" target="_blank" rel="noopener" data-keywords="国家统计局 宏观经济 人口 社会">
+                    <div class="db-card-top">
+                        <span class="db-card-index">12</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>国家统计局数据库</h3>
+                    <p>提供中国宏观经济数据、人口数据、社会数据等，是研究中国社会经济发展的重要数据来源。</p>
+                    <div class="db-card-url"><span class="url-text">stats.gov.cn</span></div>
+                </a>
+                <a class="db-card cat-human" href="http://www.tjcn.org/" target="_blank" rel="noopener" data-keywords="城市统计年鉴 城市经济 人口 环境">
+                    <div class="db-card-top">
+                        <span class="db-card-index">13</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>中国城市统计年鉴数据库</h3>
+                    <p>提供中国各城市统计年鉴数据，涵盖城市经济、人口、环境等方面，适合城市地理研究。</p>
+                    <div class="db-card-url"><span class="url-text">tjcn.org</span></div>
+                </a>
+                <a class="db-card cat-human" href="https://www.undp.org/" target="_blank" rel="noopener" data-keywords="UNDP 联合国开发计划署 HDI 人类发展指数">
+                    <div class="db-card-top">
+                        <span class="db-card-index">14</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>联合国开发计划署 (UNDP)</h3>
+                    <p>提供全球人类发展指数（HDI）等数据，适合研究全球社会经济发展和人类生活质量。</p>
+                    <div class="db-card-url"><span class="url-text">undp.org</span></div>
+                </a>
+                <a class="db-card cat-human" href="https://data.worldbank.org/" target="_blank" rel="noopener" data-keywords="世界银行 宏观经济 社会发展 国际比较">
+                    <div class="db-card-top">
+                        <span class="db-card-index">15</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>世界银行数据库</h3>
+                    <p>提供全球宏观经济数据、社会发展数据等，适合国际比较研究。</p>
+                    <div class="db-card-url"><span class="url-text">data.worldbank.org</span></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Category 4: Environment & Ecology -->
+        <section class="category-section" id="environ">
+            <div class="category-header">
+                <div class="category-icon cat-environ">&#127807;</div>
+                <div class="category-title">
+                    <h2>环境与生态类</h2>
+                    <span class="count">5 databases</span>
+                </div>
+                <div class="category-divider"></div>
+            </div>
+            <div class="cards-grid">
+                <a class="db-card cat-environ" href="http://www.mee.gov.cn/" target="_blank" rel="noopener" data-keywords="生态环境监测 空气质量 水质 土壤">
+                    <div class="db-card-top">
+                        <span class="db-card-index">16</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>中国生态环境监测总站</h3>
+                    <p>提供中国环境质量监测数据，包括空气质量、水质、土壤等方面的数据。</p>
+                    <div class="db-card-url"><span class="url-text">mee.gov.cn</span></div>
+                </a>
+                <a class="db-card cat-environ" href="https://www.geobon.org/" target="_blank" rel="noopener" data-keywords="全球生态系统 GEO BON">
+                    <div class="db-card-top">
+                        <span class="db-card-index">17</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>全球生态系统数据库 (GEO BON)</h3>
+                    <p>提供全球生态系统相关数据，适合生态地理研究。</p>
+                    <div class="db-card-url"><span class="url-text">geobon.org</span></div>
+                </a>
+                <a class="db-card cat-environ" href="https://www.gbif.org/" target="_blank" rel="noopener" data-keywords="GBIF 生物多样性 国际">
+                    <div class="db-card-top">
+                        <span class="db-card-index">18</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>国际生物多样性信息网络 (GBIF)</h3>
+                    <p>提供全球生物多样性数据，适合生物地理和生态研究。</p>
+                    <div class="db-card-url"><span class="url-text">gbif.org</span></div>
+                </a>
+                <a class="db-card cat-environ" href="http://www.cern.ac.cn/" target="_blank" rel="noopener" data-keywords="CERN 中国生态系统 生态监测">
+                    <div class="db-card-top">
+                        <span class="db-card-index">19</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>中国生态系统研究网络 (CERN)</h3>
+                    <p>提供中国生态系统监测数据，包括生态系统结构和功能数据。</p>
+                    <div class="db-card-url"><span class="url-text">cern.ac.cn</span></div>
+                </a>
+                <a class="db-card cat-environ" href="http://www.envscidata.cn/" target="_blank" rel="noopener" data-keywords="环境科学 污染监测 生态修复">
+                    <div class="db-card-top">
+                        <span class="db-card-index">20</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>中国环境科学数据共享平台</h3>
+                    <p>提供中国环境科学相关数据，包括污染监测、生态修复等方面的数据。</p>
+                    <div class="db-card-url"><span class="url-text">envscidata.cn</span></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Category 5: Ocean & Hydrology -->
+        <section class="category-section" id="ocean">
+            <div class="category-header">
+                <div class="category-icon cat-ocean">&#127754;</div>
+                <div class="category-title">
+                    <h2>海洋与水文类</h2>
+                    <span class="count">5 databases</span>
+                </div>
+                <div class="category-divider"></div>
+            </div>
+            <div class="cards-grid">
+                <a class="db-card cat-ocean" href="http://www.nmdis.org.cn/" target="_blank" rel="noopener" data-keywords="国家海洋信息中心 海洋环境 海洋观测">
+                    <div class="db-card-top">
+                        <span class="db-card-index">21</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>国家海洋信息中心</h3>
+                    <p>提供海洋环境数据、海洋观测数据等，适合海洋地理研究。</p>
+                    <div class="db-card-url"><span class="url-text">nmdis.org.cn</span></div>
+                </a>
+                <a class="db-card cat-ocean" href="https://www.goosocean.org/" target="_blank" rel="noopener" data-keywords="GOOS 全球海洋观测 温度 盐度 海流">
+                    <div class="db-card-top">
+                        <span class="db-card-index">22</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>全球海洋数据联盟 (GOOS)</h3>
+                    <p>提供全球海洋观测数据，包括海洋温度、盐度、海流等数据。</p>
+                    <div class="db-card-url"><span class="url-text">goosocean.org</span></div>
+                </a>
+                <a class="db-card cat-ocean" href="https://www.noaa.gov/" target="_blank" rel="noopener" data-keywords="NOAA 海洋 大气 模型">
+                    <div class="db-card-top">
+                        <span class="db-card-index">23</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>美国国家海洋和大气管理局 (NOAA)</h3>
+                    <p>提供海洋和大气数据，包括海洋观测、海洋模型输出等。</p>
+                    <div class="db-card-url"><span class="url-text">noaa.gov</span></div>
+                </a>
+                <a class="db-card cat-ocean" href="http://www.iwhr.com/" target="_blank" rel="noopener" data-keywords="中国水利水电 水文 水资源">
+                    <div class="db-card-top">
+                        <span class="db-card-index">24</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>中国水利水电科学研究院</h3>
+                    <p>提供水文数据、水资源数据等，适合水文地理研究。</p>
+                    <div class="db-card-url"><span class="url-text">iwhr.com</span></div>
+                </a>
+                <a class="db-card cat-ocean" href="https://www.ghadc.org/" target="_blank" rel="noopener" data-keywords="GHADC 全球水文 水文分析">
+                    <div class="db-card-top">
+                        <span class="db-card-index">25</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>全球水文数据和分析中心 (GHADC)</h3>
+                    <p>提供水文数据和分析工具，适合全球水文研究。</p>
+                    <div class="db-card-url"><span class="url-text">ghadc.org</span></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Category 6: Historical Geography -->
+        <section class="category-section" id="history">
+            <div class="category-header">
+                <div class="category-icon cat-history">&#128218;</div>
+                <div class="category-title">
+                    <h2>历史地理类</h2>
+                    <span class="count">5 databases</span>
+                </div>
+                <div class="category-divider"></div>
+            </div>
+            <div class="cards-grid">
+                <a class="db-card cat-history" href="http://www.chgis.cn/" target="_blank" rel="noopener" data-keywords="CHGIS 中国历史地理信息系统 行政区划 历史人口">
+                    <div class="db-card-top">
+                        <span class="db-card-index">26</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>中国历史地理信息系统 (CHGIS)</h3>
+                    <p>提供中国历史地理数据，包括历史行政区划、历史人口等数据。</p>
+                    <div class="db-card-url"><span class="url-text">chgis.cn</span></div>
+                </a>
+                <a class="db-card cat-history" href="http://chgis.fas.harvard.edu/" target="_blank" rel="noopener" data-keywords="哈佛大学 CHGIS 高精度 历史地理">
+                    <div class="db-card-top">
+                        <span class="db-card-index">27</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>哈佛大学中国历史地理信息系统</h3>
+                    <p>提供高精度的历史地理数据，适合历史地理研究。</p>
+                    <div class="db-card-url"><span class="url-text">chgis.fas.harvard.edu</span></div>
+                </a>
+                <a class="db-card cat-history" href="http://www.historicalatlas.cn/" target="_blank" rel="noopener" data-keywords="中国历史地图集 历史时期 地图">
+                    <div class="db-card-top">
+                        <span class="db-card-index">28</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>中国历史地图集</h3>
+                    <p>提供中国历史时期的地图数据，适合研究历史地理变迁。</p>
+                    <div class="db-card-url"><span class="url-text">historicalatlas.cn</span></div>
+                </a>
+                <a class="db-card cat-history" href="http://www.ancientbooks.cn/" target="_blank" rel="noopener" data-keywords="中国历史文献数据库 历史文献">
+                    <div class="db-card-top">
+                        <span class="db-card-index">29</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>中国历史文献数据库</h3>
+                    <p>提供历史文献数据，适合研究历史地理背景。</p>
+                    <div class="db-card-url"><span class="url-text">ancientbooks.cn</span></div>
+                </a>
+                <a class="db-card cat-history" href="http://www.chgi.org/" target="_blank" rel="noopener" data-keywords="CHGI 历史地理 分析工具">
+                    <div class="db-card-top">
+                        <span class="db-card-index">30</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>中国历史地理信息系统 (CHGI)</h3>
+                    <p>提供历史地理数据和分析工具，适合历史地理研究。</p>
+                    <div class="db-card-url"><span class="url-text">chgi.org</span></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Category 7: Comprehensive GIS Platforms -->
+        <section class="category-section" id="platform">
+            <div class="category-header">
+                <div class="category-icon cat-platform">&#128202;</div>
+                <div class="category-title">
+                    <h2>综合地理数据平台</h2>
+                    <span class="count">6 databases</span>
+                </div>
+                <div class="category-divider"></div>
+            </div>
+            <div class="cards-grid">
+                <a class="db-card cat-platform" href="https://www.arcgis.com/" target="_blank" rel="noopener" data-keywords="ArcGIS Online GIS 分析工具">
+                    <div class="db-card-top">
+                        <span class="db-card-index">31</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>ArcGIS Online</h3>
+                    <p>提供地理信息系统（GIS）数据和分析工具，适合地理学研究和教学。</p>
+                    <div class="db-card-url"><span class="url-text">arcgis.com</span></div>
+                </a>
+                <a class="db-card cat-platform" href="https://earthengine.google.com/" target="_blank" rel="noopener" data-keywords="Google Earth Engine 卫星影像 遥感 分析">
+                    <div class="db-card-top">
+                        <span class="db-card-index">32</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>Google Earth Engine</h3>
+                    <p>提供全球卫星影像数据和分析工具，适合遥感和地理学研究。</p>
+                    <div class="db-card-url"><span class="url-text">earthengine.google.com</span></div>
+                </a>
+                <a class="db-card cat-platform" href="https://qgis.org/" target="_blank" rel="noopener" data-keywords="QGIS 开源 GIS 软件">
+                    <div class="db-card-top">
+                        <span class="db-card-index">33</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>QGIS</h3>
+                    <p>提供开源地理信息系统（GIS）软件和数据，适合地理学研究和教学。</p>
+                    <div class="db-card-url"><span class="url-text">qgis.org</span></div>
+                </a>
+                <a class="db-card cat-platform" href="http://www.tianditu.gov.cn/" target="_blank" rel="noopener" data-keywords="天地图 国家地理信息公共服务 地图服务">
+                    <div class="db-card-top">
+                        <span class="db-card-index">34</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>国家地理信息公共服务平台（天地图）</h3>
+                    <p>提供中国地理信息数据和地图服务，提供高精度地图数据和地理信息服务，适合地理学研究和应用。</p>
+                    <div class="db-card-url"><span class="url-text">tianditu.gov.cn</span></div>
+                </a>
+                <a class="db-card cat-platform" href="http://www.gscloud.cn/" target="_blank" rel="noopener" data-keywords="地理空间数据云 遥感 GIS 地形">
+                    <div class="db-card-top">
+                        <span class="db-card-index">35</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>地理空间数据云</h3>
+                    <p>提供遥感、GIS、地形等多种数据，适合地理学综合研究。</p>
+                    <div class="db-card-url"><span class="url-text">gscloud.cn</span></div>
+                </a>
+                <a class="db-card cat-platform" href="http://www.tianditu.gov.cn/" target="_blank" rel="noopener" data-keywords="地理信息公共服务 天地图 高精度">
+                    <div class="db-card-top">
+                        <span class="db-card-index">36</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>地理信息公共服务平台（天地图）</h3>
+                    <p>提供高精度地图数据和地理信息服务，适合地理学研究和应用。</p>
+                    <div class="db-card-url"><span class="url-text">tianditu.gov.cn</span></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Category 8: GIS Tech & Maps -->
+        <section class="category-section" id="tech">
+            <div class="category-header">
+                <div class="category-icon cat-tech">&#128205;</div>
+                <div class="category-title">
+                    <h2>地理信息技术与地图类</h2>
+                    <span class="count">5 databases</span>
+                </div>
+                <div class="category-divider"></div>
+            </div>
+            <div class="cards-grid">
+                <a class="db-card cat-tech" href="https://www.webmap.cn/" target="_blank" rel="noopener" data-keywords="全国地理信息资源 目录服务 测绘 影像">
+                    <div class="db-card-top">
+                        <span class="db-card-index">37</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>全国地理信息资源目录服务系统</h3>
+                    <p>负责管理全国测绘成果资料和档案资料，可下载不涉密的影像数据等。</p>
+                    <div class="db-card-url"><span class="url-text">webmap.cn</span></div>
+                </a>
+                <a class="db-card cat-tech" href="https://kmap.ckcest.cn/" target="_blank" rel="noopener" data-keywords="地理信息专业知识服务 地表覆盖 地形图">
+                    <div class="db-card-top">
+                        <span class="db-card-index">38</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>地理信息专业知识服务系统</h3>
+                    <p>提供地表覆盖数据，以及1:100万全国地形图、1:25万全国地形图等。</p>
+                    <div class="db-card-url"><span class="url-text">kmap.ckcest.cn</span></div>
+                </a>
+                <a class="db-card cat-tech" href="http://bzdt.ch.mnr.gov.cn/" target="_blank" rel="noopener" data-keywords="标准地图服务 自然资源部 中国地图 世界地图">
+                    <div class="db-card-top">
+                        <span class="db-card-index">39</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>标准地图服务系统</h3>
+                    <p>由国家自然资源部出品，提供丰富的中国地图、世界地图标准文件及专题地图。</p>
+                    <div class="db-card-url"><span class="url-text">bzdt.ch.mnr.gov.cn</span></div>
+                </a>
+                <a class="db-card cat-tech" href="https://www.openstreetmap.org/" target="_blank" rel="noopener" data-keywords="OpenStreetMap OSM 免费 GIS 协作">
+                    <div class="db-card-top">
+                        <span class="db-card-index">40</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>OpenStreetMap</h3>
+                    <p>用户可免费获取不同级别和精度的 GIS 数据，由全球用户共同协作维护更新。</p>
+                    <div class="db-card-url"><span class="url-text">openstreetmap.org</span></div>
+                </a>
+                <a class="db-card cat-tech" href="https://huiyan.baidu.com" target="_blank" rel="noopener" data-keywords="百度地图智慧眼 大数据 城市群">
+                    <div class="db-card-top">
+                        <span class="db-card-index">41</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>百度地图智慧眼</h3>
+                    <p>基于百度地图大数据，有城市群分布等多种地图数据，可用于城市地理等方面研究。</p>
+                    <div class="db-card-url"><span class="url-text">huiyan.baidu.com</span></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Category 9: Remote Sensing & Satellite -->
+        <section class="category-section" id="remote">
+            <div class="category-header">
+                <div class="category-icon cat-remote">&#128247;</div>
+                <div class="category-title">
+                    <h2>遥感与卫星数据类</h2>
+                    <span class="count">4 databases</span>
+                </div>
+                <div class="category-divider"></div>
+            </div>
+            <div class="cards-grid">
+                <a class="db-card cat-remote" href="http://www.gscloud.cn/" target="_blank" rel="noopener" data-keywords="地理空间数据云 遥感 雷达 高程模型">
+                    <div class="db-card-top">
+                        <span class="db-card-index">42</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>地理空间数据云</h3>
+                    <p>提供遥感、雷达、高程模型等多种数据，数据资源丰富，覆盖范围广。</p>
+                    <div class="db-card-url"><span class="url-text">gscloud.cn</span></div>
+                </a>
+                <a class="db-card cat-remote" href="https://earthexplorer.usgs.gov/" target="_blank" rel="noopener" data-keywords="USGS EarthExplorer Landsat 卫星遥感">
+                    <div class="db-card-top">
+                        <span class="db-card-index">43</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>美国地质勘探局 (USGS)</h3>
+                    <p>提供 Landsat 系列等卫星遥感数据，适合长时序分析，数据质量高、应用广泛。</p>
+                    <div class="db-card-url"><span class="url-text">earthexplorer.usgs.gov</span></div>
+                </a>
+                <a class="db-card cat-remote" href="https://ladsweb.modaps.eosdis.nasa.gov/" target="_blank" rel="noopener" data-keywords="LAADS DAAC MODIS ENVISAT Sentinel NASA">
+                    <div class="db-card-top">
+                        <span class="db-card-index">44</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>LAADS DAAC</h3>
+                    <p>一级和大气存档与分发系统，有 MODIS、ENVISAT、Sentinel 等常见遥感数据，是 NASA 重要的数据存储和分发平台。</p>
+                    <div class="db-card-url"><span class="url-text">ladsweb.modaps.eosdis.nasa.gov</span></div>
+                </a>
+                <a class="db-card cat-remote" href="https://neo.gsfc.nasa.gov/" target="_blank" rel="noopener" data-keywords="NASA NEO Earth Observations 卫星影像 大气 能源 土地">
+                    <div class="db-card-top">
+                        <span class="db-card-index">45</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>NASA Earth Observations (NEO)</h3>
+                    <p>专注于提供全球范围内的卫星影像，涵盖大气、能源、土地等50多种不同数据专题。</p>
+                    <div class="db-card-url"><span class="url-text">neo.gsfc.nasa.gov</span></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Category 10: Comprehensive Data -->
+        <section class="category-section" id="compre">
+            <div class="category-header">
+                <div class="category-icon cat-compre">&#128230;</div>
+                <div class="category-title">
+                    <h2>综合数据类</h2>
+                    <span class="count">4 databases</span>
+                </div>
+                <div class="category-divider"></div>
+            </div>
+            <div class="cards-grid">
+                <a class="db-card cat-compre" href="http://www.data.ac.cn/" target="_blank" rel="noopener" data-keywords="中国自然资源数据库 自然资源 土地 水 矿产">
+                    <div class="db-card-top">
+                        <span class="db-card-index">46</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>中国自然资源数据库</h3>
+                    <p>涵盖自然资源多领域数据，如土地、水、矿产等，为地理学综合研究提供数据支持。</p>
+                    <div class="db-card-url"><span class="url-text">data.ac.cn</span></div>
+                </a>
+                <a class="db-card cat-compre" href="http://geodata.grid.unep.ch/" target="_blank" rel="noopener" data-keywords="联合国环境规划署 UNEP 全球环境 土地覆盖 水质">
+                    <div class="db-card-top">
+                        <span class="db-card-index">47</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>联合国环境规划署</h3>
+                    <p>统筹全世界环保工作，提供全球环境相关数据，如土地覆盖、水质等。</p>
+                    <div class="db-card-url"><span class="url-text">geodata.grid.unep.ch</span></div>
+                </a>
+                <a class="db-card cat-compre" href="http://worldmap.harvard.edu/chinamap/" target="_blank" rel="noopener" data-keywords="哈佛大学世界地图 交通 宗教 人口密度">
+                    <div class="db-card-top">
+                        <span class="db-card-index">48</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>哈佛大学世界地图</h3>
+                    <p>有交通网络、宗教信仰分布、人口密度图等多种数据，可用于人文地理等研究。</p>
+                    <div class="db-card-url"><span class="url-text">worldmap.harvard.edu</span></div>
+                </a>
+                <a class="db-card cat-compre" href="http://www.geodata.cn/data/" target="_blank" rel="noopener" data-keywords="国家地球系统科学数据中心 降水 气温 水文 径流">
+                    <div class="db-card-top">
+                        <span class="db-card-index">49</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>国家地球系统科学数据中心</h3>
+                    <p>数据类型全面，包含降水、气温、水文站点、径流量等水文地理数据。</p>
+                    <div class="db-card-url"><span class="url-text">geodata.cn</span></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Category 11: Online Map Tools -->
+        <section class="category-section" id="extra">
+            <div class="category-header">
+                <div class="category-icon cat-extra">&#128269;</div>
+                <div class="category-title">
+                    <h2>在线地图工具</h2>
+                    <span class="count">3 resources</span>
+                </div>
+                <div class="category-divider"></div>
+            </div>
+            <div class="cards-grid">
+                <a class="db-card cat-extra" href="https://www.shengshixian.com/pages/d35ae5/" target="_blank" rel="noopener" data-keywords="省市县 行政区划 在线地图">
+                    <div class="db-card-top">
+                        <span class="db-card-index">50</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>省市县在线地图</h3>
+                    <p>提供中国省市县行政区划在线地图查询工具，可快速定位和查看行政区划信息。</p>
+                    <div class="db-card-url"><span class="url-text">shengshixian.com</span></div>
+                </a>
+                <a class="db-card cat-extra" href="https://map.ruiduobao.com/" target="_blank" rel="noopener" data-keywords="锐度宝 在线地图 地理工具">
+                    <div class="db-card-top">
+                        <span class="db-card-index">51</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>锐度宝在线地图</h3>
+                    <p>在线地图工具平台，提供多种地图查看和地理信息查询功能。</p>
+                    <div class="db-card-url"><span class="url-text">map.ruiduobao.com</span></div>
+                </a>
+                <a class="db-card cat-extra" href="https://www.gisrsdata.com/pages/783964/" target="_blank" rel="noopener" data-keywords="GIS RS Data 遥感数据 在线">
+                    <div class="db-card-top">
+                        <span class="db-card-index">52</span>
+                        <span class="db-card-external">&#8599;</span>
+                    </div>
+                    <h3>GISRS Data</h3>
+                    <p>提供 GIS 与遥感数据在线服务，支持数据查询与下载。</p>
+                    <div class="db-card-url"><span class="url-text">gisrsdata.com</span></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- No Results -->
+        <div class="no-results" id="noResults">
+            <div class="icon">&#128269;</div>
+            <p>未找到匹配的数据库，请尝试其他关键词。</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#weather">气象气候</a>
+            <a href="#geology">地质地形</a>
+            <a href="#human">人文社会</a>
+            <a href="#environ">环境生态</a>
+            <a href="#ocean">海洋水文</a>
+            <a href="#remote">遥感卫星</a>
+        </div>
+        <p>Wei4Wang &middot; Research Data Hub &middot; Curated for scientific exploration</p>
+    </footer>
+
+    <script>
+        // ===== Starfield Animation =====
+        (function() {
+            const canvas = document.getElementById('starfield');
+            const ctx = canvas.getContext('2d');
+            let stars = [];
+            let w, h;
+
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+                initStars();
+            }
+
+            function initStars() {
+                stars = [];
+                const count = Math.floor((w * h) / 8000);
+                for (let i = 0; i < count; i++) {
+                    stars.push({
+                        x: Math.random() * w,
+                        y: Math.random() * h,
+                        r: Math.random() * 1.5 + 0.3,
+                        opacity: Math.random() * 0.5 + 0.1,
+                        speed: Math.random() * 0.15 + 0.02,
+                        twinkle: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, w, h);
+                for (const s of stars) {
+                    s.twinkle += 0.02;
+                    const alpha = s.opacity * (0.5 + 0.5 * Math.sin(s.twinkle));
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(200, 220, 255, ' + alpha + ')';
+                    ctx.fill();
+
+                    s.y += s.speed;
+                    if (s.y > h) {
+                        s.y = 0;
+                        s.x = Math.random() * w;
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+
+            window.addEventListener('resize', resize);
+            resize();
+            animate();
+        })();
+
+        // ===== Scroll Progress =====
+        (function() {
+            const bar = document.getElementById('scrollProgress');
+            window.addEventListener('scroll', function() {
+                const scrolled = window.scrollY;
+                const total = document.documentElement.scrollHeight - window.innerHeight;
+                const pct = total > 0 ? (scrolled / total) * 100 : 0;
+                bar.style.width = pct + '%';
+            });
+        })();
+
+        // ===== Search Filter =====
+        (function() {
+            const input = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('clearBtn');
+            const searchBox = document.getElementById('searchBox');
+            const cards = document.querySelectorAll('.db-card');
+            const sections = document.querySelectorAll('.category-section');
+            const noResults = document.getElementById('noResults');
+
+            input.addEventListener('input', function() {
+                const query = this.value.trim().toLowerCase();
+                searchBox.classList.toggle('has-text', query.length > 0);
+
+                let visibleCount = 0;
+                sections.forEach(function(section) {
+                    let sectionVisible = 0;
+                    const sectionCards = section.querySelectorAll('.db-card');
+                    sectionCards.forEach(function(card) {
+                        const title = card.querySelector('h3').textContent.toLowerCase();
+                        const desc = card.querySelector('p').textContent.toLowerCase();
+                        const url = card.querySelector('.url-text').textContent.toLowerCase();
+                        const keywords = (card.getAttribute('data-keywords') || '').toLowerCase();
+                        const match = !query ||
+                            title.includes(query) ||
+                            desc.includes(query) ||
+                            url.includes(query) ||
+                            keywords.includes(query);
+                        card.style.display = match ? '' : 'none';
+                        if (match) sectionVisible++;
+                    });
+                    section.style.display = sectionVisible > 0 ? '' : 'none';
+                    visibleCount += sectionVisible;
+                });
+
+                noResults.classList.toggle('show', visibleCount === 0 && query.length > 0);
+            });
+
+            clearBtn.addEventListener('click', function() {
+                input.value = '';
+                input.dispatchEvent(new Event('input'));
+                input.focus();
+            });
+        })();
+
+        // ===== Smooth Scroll for Nav Links =====
+        document.querySelectorAll('.nav-links a, .footer a').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href && href.startsWith('#')) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
